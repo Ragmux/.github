@@ -1,0 +1,105 @@
+name: Bug report
+description: Something in Ragmux behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please **do not** report security problems here —
+        follow [SECURITY.md](https://github.com/Ragmux/.github/blob/main/SECURITY.md) instead.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you start
+      options:
+        - label: I searched the existing issues and this is not a duplicate.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true
+        - label: I am running a supported version (the latest 0.2.x, or `main`).
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `ragmux -version`, or the `version` field of `/healthz`.
+      placeholder: "0.2.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment
+      options:
+        - Docker Compose (bundled Postgres)
+        - Docker image with an external PostgreSQL
+        - Bare binary
+        - Built from source
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provider involved
+      description: Leave empty if the problem is not tied to one provider.
+      multiple: true
+      options:
+        - openai
+        - anthropic
+        - gemini
+        - deepseek
+        - ollama
+        - custom_openai (vLLM, LM Studio, LiteLLM, …)
+        - none / not provider specific
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you observed, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: >
+        The smallest sequence that shows the problem. `curl` commands are ideal —
+        please redact API keys.
+      placeholder: |
+        1. Create a model connection with provider_type "anthropic"
+        2. curl -N localhost:8080/v1/chat/completions -H 'Authorization: Bearer sk-proj-...' ...
+        3. The stream ends after the first chunk
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and error output
+      description: >
+        Relevant gateway log lines and the error envelope you received.
+        Secrets, project keys and provider keys must be removed.
+      render: shell
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: >
+        The environment variables that matter here, **without values for secrets**
+        (`SECRET_KEY`, `DATABASE_URL`, provider keys).
+      render: shell
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Reverse proxy, PostgreSQL version, replica count, anything unusual about the setup.

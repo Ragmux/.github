@@ -25,7 +25,7 @@ You need **Go 1.27+** and Docker for the database.
 git clone https://github.com/Ragmux/ragmux.git && cd ragmux
 make dev-db     # pgvector Postgres on localhost:5433 (docker-compose.dev.yml)
 make test       # unit + end-to-end tests (mock upstream, real Postgres)
-make run        # builds and runs on :8080 against the dev database
+make run        # builds and runs on :8765 against the dev database
 ```
 
 Tests read `TEST_DATABASE_URL` — the Makefile defaults it to the `make dev-db` instance — and
@@ -54,8 +54,11 @@ make test
   are consistent across the tree; follow what is already there rather than introducing a new
   idiom.
 - **Schema changes** are embedded SQL files in `internal/store/migrations/`, applied at startup
-  under an advisory lock. Add a new numbered file — never edit one that has shipped — and bump
-  the expected schema version in the migration tests.
+  under an advisory lock. Add a new numbered file — never edit one that has shipped — and keep
+  the numbering contiguous: `TestMigrationNumbersUniqueAndContiguous` fails on a gap or a
+  duplicate. Keep migrations **additive** — a rolling update leaves older replicas serving
+  against the newer schema, so dropping or renaming a column, or narrowing a type, breaks
+  them.
 - **New behaviour comes with tests.** A provider adapter needs a mock-upstream test; a store
   change needs a test against real Postgres.
 - **Document what users can see.** A new environment variable, endpoint, header or response

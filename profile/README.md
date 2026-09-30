@@ -10,6 +10,8 @@
 [![License](https://img.shields.io/github/license/Ragmux/ragmux?style=flat-square&color=blue)](https://github.com/Ragmux/ragmux/blob/main/LICENSE)
 [![Container](https://img.shields.io/badge/ghcr.io-ragmux%2Fragmux-1f6feb?style=flat-square&logo=docker&logoColor=white)](https://github.com/Ragmux/ragmux/pkgs/container/ragmux)
 
+[![Designed & Maintained with Tan](https://www.muhammetsafak.com.tr/badges/designed-maintained-with-tan.svg)](https://www.muhammetsafak.com.tr/en/tan/)
+
 [**Repository**](https://github.com/Ragmux/ragmux) · [**Website**](https://ragmux.com) · [**Documentation**](https://github.com/Ragmux/ragmux#documentation) · [**Releases**](https://github.com/Ragmux/ragmux/releases)
 
 </div>

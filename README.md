@@ -34,5 +34,5 @@ one closest to the code wins.
 ## About
 
 Ragmux is a [Tunedness](https://tunedness.com) project, built by
-[Muhammet Şafak](https://www.muhammetsafak.com.tr/en/), and is licensed under
+[Muhammet Şafak](https://muhammetsafak.com/), and is licensed under
 AGPL-3.0-or-later. See [LICENSE](LICENSE).

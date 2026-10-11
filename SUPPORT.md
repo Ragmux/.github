@@ -45,5 +45,5 @@ vulnerability reporting, or <security@ragmux.com>.
 
 There is no SLA, no paid support tier and no guarantee that a given deployment will be
 debugged for you. Ragmux is free software maintained by
-[Muhammet Şafak](https://www.muhammetsafak.com.tr/en/) as a [Tunedness](https://tunedness.com)
+[Muhammet Şafak](https://muhammetsafak.com/) as a [Tunedness](https://tunedness.com)
 project; help is offered as time allows, and a clear, reproducible report gets it fastest.

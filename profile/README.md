@@ -81,7 +81,7 @@ and please report security problems privately as described in
 ## About
 
 Ragmux is a [**Tunedness**](https://tunedness.com) project, built by
-[**Muhammet Şafak**](https://www.muhammetsafak.com.tr/en/).
+[**Muhammet Şafak**](https://muhammetsafak.com/).
 
 It is free software licensed under the **GNU Affero General Public License v3.0 or later**
 (AGPL-3.0-or-later). The network-service clause applies: run a modified version as a service

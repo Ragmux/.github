@@ -53,4 +53,4 @@ By contributing, you agree that your contribution is licensed under the license 
 
 ## Code of Conduct
 
-This project is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold it.
+Every repository in this organization is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold it.

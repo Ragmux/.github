@@ -1,92 +1,56 @@
 # Contributing to Ragmux
 
-Thanks for taking the time. Bug reports, documentation fixes and pull requests are all
-welcome on [Ragmux/ragmux](https://github.com/Ragmux/ragmux).
+Thank you for your interest in contributing. This guide explains how to propose changes to any repository in the [Ragmux](https://github.com/Ragmux) organization.
 
-Please **do not** open a public issue for a security problem — follow
-[SECURITY.md](SECURITY.md) instead.
+## Before You Start
 
-## Before you start
+- Small fixes (typos, broken links, obvious bugs) can be sent directly as a pull request.
+- For a new feature or a change in behavior, open an issue first so the approach can be discussed before you write code.
+- Opening a pull request does not guarantee that it will be accepted.
+- Do not report security vulnerabilities in issues or pull requests; follow the [security policy](SECURITY.md).
 
-- **Bugs:** open an issue with the version (`ragmux -version` or `/healthz`), the deployment
-  shape (Docker Compose, bare binary, reverse proxy), the provider involved and the steps to
-  reproduce. Logs and the exact error envelope help more than a description of them.
-- **Features:** open an issue describing the problem before writing code. Something may be on
-  the roadmap, deliberately out of scope, or solvable with existing configuration — a short
-  conversation saves you an afternoon.
-- **Small fixes** (typos, broken links, an obviously wrong default) need no issue. Send the
-  pull request.
+## Development Setup
 
-## Development setup
+Requirements and setup commands differ per repository. For the main project, see [CONTRIBUTING.md in Ragmux/ragmux](https://github.com/Ragmux/ragmux/blob/main/CONTRIBUTING.md).
 
-You need **Go 1.27+** and Docker for the database.
+## Running Tests
 
-```bash
-git clone https://github.com/Ragmux/ragmux.git && cd ragmux
-make dev-db     # pgvector Postgres on localhost:5433 (docker-compose.dev.yml)
-make test       # unit + end-to-end tests (mock upstream, real Postgres)
-make run        # builds and runs on :8765 against the dev database
+The test and lint commands are the same ones CI runs, and they are listed in each repository's own contributing guide. For the main project, see [CONTRIBUTING.md in Ragmux/ragmux](https://github.com/Ragmux/ragmux/blob/main/CONTRIBUTING.md). Run them before opening a pull request.
+
+## Commit Messages
+
+Every repository in this organization follows [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/):
+
+```text
+<type>(<scope>)!: <description>
+
+<body>
 ```
 
-Tests read `TEST_DATABASE_URL` — the Makefile defaults it to the `make dev-db` instance — and
-create a throwaway schema per test, so they run in parallel against one server. They are
-**skipped** when the variable is unset, so check that your tests actually ran before claiming
-they pass.
+- **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+- **Scope** is optional, lowercase kebab-case, and names a module or area: `feat(auth): ...`.
+- **Description** is in English, imperative mood, starts with a lowercase letter, has no trailing period and is at most 72 characters.
+- **Body** is optional and explains why the change was made. Wrap lines at 72 characters.
+- Mark a breaking change only with `!` after the type or scope, and describe it in the body.
+- Do not add footers or trailers (`BREAKING CHANGE:`, `Refs:`, `Closes #12`, `Co-Authored-By:`, `Signed-off-by:` or any tool attribution). Link issues in the pull request description instead.
+- Keep one logical change per commit.
 
-The binary is pure Go (`CGO_ENABLED=0`, `pgx`) and ships as a static executable on a
-distroless base. Keep it that way: no cgo, no runtime dependency on a shell.
+Example:
 
-## What CI checks
-
-Your pull request must pass the same gates that run locally:
-
-```bash
-gofmt -l .                  # must print nothing
-go vet ./...
-golangci-lint run ./...     # v2, config in .golangci.yml
-govulncheck ./...
-make test
+```text
+fix(api): return 404 for unknown project slug
 ```
 
-## House style
+## Pull Requests
 
-- **Match the surrounding code.** Naming, error wrapping, comment density and package layout
-  are consistent across the tree; follow what is already there rather than introducing a new
-  idiom.
-- **Schema changes** are embedded SQL files in `internal/store/migrations/`, applied at startup
-  under an advisory lock. Add a new numbered file — never edit one that has shipped — and keep
-  the numbering contiguous: `TestMigrationNumbersUniqueAndContiguous` fails on a gap or a
-  duplicate. Keep migrations **additive** — a rolling update leaves older replicas serving
-  against the newer schema, so dropping or renaming a column, or narrowing a type, breaks
-  them.
-- **New behaviour comes with tests.** A provider adapter needs a mock-upstream test; a store
-  change needs a test against real Postgres.
-- **Document what users can see.** A new environment variable, endpoint, header or response
-  field belongs in the matching page under `docs/` and in `CHANGELOG.md` under `Unreleased`.
-- **Secrets never reach a log line or an API response.** Provider keys are encrypted at rest
-  and stay server-side; project keys are shown once at creation.
-- **Provider credentials in tests are fake.** Never commit a real key, a real `.env` or a
-  database dump.
+1. Create a branch from `main` named `<type>/<short-kebab-description>`, for example `feat/token-refresh` or `fix/123-null-slug-404`.
+2. Write the pull request title in Conventional Commits format. Pull requests are squash merged, so the title becomes the commit message on `main`.
+3. If the change affects users, add an entry under `## [Unreleased]` in the repository's `CHANGELOG.md`.
+4. Fill in the pull request template and link the related issue with `Closes #<number>`.
+5. Make sure CI passes. A maintainer reviews the pull request and may ask for changes before merging.
 
-## Commits and pull requests
+By contributing, you agree that your contribution is licensed under the license of the repository you contribute to. There is no CLA.
 
-- Write commit subjects in the **imperative mood**, describing the change and not the file it
-  touched: `Add summary comparison and breakdown options`, not `updated metrics.go`. The
-  repository does not use Conventional Commits.
-- Keep a pull request to one topic. Two unrelated fixes are two pull requests.
-- Rebase on `main` rather than merging it back into your branch.
-- Fill in the pull request template: what changed, why, how you tested it, and whether it
-  breaks anything for an existing deployment.
-- A pull request that changes the API surface, the schema or a default is expected to say so
-  explicitly. Silent breaking changes are the one thing that will get a change reverted after
-  it lands.
+## Code of Conduct
 
-## Licensing
-
-Ragmux is licensed under **AGPL-3.0-or-later**. By contributing you agree that your
-contribution is licensed under the same terms. There is no CLA.
-
-## Code of conduct
-
-Participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). Reports go to
-<contact@ragmux.com>.
+This project is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold it.

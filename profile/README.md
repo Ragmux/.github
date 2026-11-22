@@ -8,11 +8,11 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/Ragmux/ragmux/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/Ragmux/ragmux/actions)
 [![Go](https://img.shields.io/github/go-mod/go-version/Ragmux/ragmux?style=flat-square&logo=go&logoColor=white&label=go)](https://github.com/Ragmux/ragmux)
 [![License](https://img.shields.io/github/license/Ragmux/ragmux?style=flat-square&color=blue)](https://github.com/Ragmux/ragmux/blob/main/LICENSE)
-[![Container](https://img.shields.io/badge/ghcr.io-ragmux%2Fragmux-1f6feb?style=flat-square&logo=docker&logoColor=white)](https://github.com/Ragmux/ragmux/pkgs/container/ragmux)
+[![Docker Hub](https://img.shields.io/docker/v/ragmux/ragmux?sort=semver&style=flat-square&logo=docker&logoColor=white&label=docker%20hub)](https://hub.docker.com/r/ragmux/ragmux)
 
-[![Designed & Maintained with Tan](https://www.muhammetsafak.com.tr/badges/designed-maintained-with-tan.svg)](https://www.muhammetsafak.com.tr/en/tan/)
+[![Designed & Maintained with Tan](https://muhammetsafak.com/badges/designed-maintained-with-tan.svg)](https://muhammetsafak.com/tan/)
 
-[**Repository**](https://github.com/Ragmux/ragmux) · [**Website**](https://ragmux.com) · [**Documentation**](https://github.com/Ragmux/ragmux#documentation) · [**Releases**](https://github.com/Ragmux/ragmux/releases)
+[**Repository**](https://github.com/Ragmux/ragmux) · [**Website**](https://ragmux.com) · [**Documentation**](https://github.com/Ragmux/ragmux#documentation) · [**Wiki**](https://github.com/Ragmux/ragmux/wiki) · [**Releases**](https://github.com/Ragmux/ragmux/releases)
 
 </div>
 
@@ -21,50 +21,57 @@
 ## What Ragmux is
 
 [**Ragmux**](https://github.com/Ragmux/ragmux) is a single-binary AI gateway written in Go.
-It sits between your applications and LLM providers, exposes one **OpenAI-compatible API**,
-and can augment every request with **retrieval (RAG)** from documents you upload.
+It sits between your applications and LLM providers, exposes one **OpenAI-compatible API**
+(and an Anthropic-compatible one), keeps provider credentials on the server, and can augment
+every request with **retrieval (RAG)** from documents you upload.
 
 All state — users, model connections, projects, documents, chunks, vectors and metrics —
-lives in one **PostgreSQL** database with the `pgvector` extension. Two containers, no Redis,
-no separate vector database.
+lives in one **PostgreSQL** database with the `pgvector` extension. No Redis, no separate
+vector database: one all-in-one container, or the gateway against your own PostgreSQL.
 
 ```
-client  ──►  POST /v1/chat/completions (Bearer sk-proj-…)
+client  ──►  /v1/chat/completions · /v1/messages · /v1/embeddings · /mcp   (Bearer sk-proj-…)
              │
-             ├─ project → model connection (provider credentials stay server-side)
-             ├─ project → RAG store (optional): embed query → top-k chunks → inject context
-             └─ adapter: OpenAI · Anthropic · Gemini · DeepSeek · Ollama · custom OpenAI (vLLM…)
-                          JSON and SSE streaming, normalised to the OpenAI schema
+             ├─ key checks: CIDR / Origin allowlist, rate limits, budgets, end-user limits
+             ├─ guardrails: block, redact or flag before the request, retrieval and answer
+             ├─ project → RAG store (optional): hybrid search → rerank → inject context
+             ├─ project → route: prioritised targets, retry, fallback, circuit breaker
+             └─ adapter: OpenAI · Azure OpenAI · Anthropic · Gemini · DeepSeek · Ollama ·
+                         any OpenAI-compatible server (vLLM, LM Studio, LiteLLM…)
              │
-             └─ PostgreSQL + pgvector: users, connections (AES-256-GCM keys), projects,
-                documents (bytea), chunks, HNSW vector indexes, request logs
+             └─ PostgreSQL + pgvector: users, encrypted credentials, projects, documents,
+                chunks, HNSW vector indexes, request logs, audit log
 ```
 
 ## What it gives you
 
 | | |
 |---|---|
-| **One API, every provider** | `/v1/chat/completions` and `/v1/models`, JSON and SSE streaming. Point any OpenAI SDK at it by changing `base_url` and `api_key`. Anthropic and Gemini requests and streams are translated for you. |
-| **Retrieval that ships with the gateway** | PDF / DOCX / HTML / TXT / Markdown, section-aware chunking with contextual embeddings, hybrid vector + full-text search (RRF), optional LLM reranking. |
-| **Keys that never leave the server** | One `sk-proj-…` key per project, mapped to a model connection, a system prompt and an optional RAG store. Provider credentials are encrypted at rest with AES-256-GCM. |
-| **Users, roles and an audit trail** | `admin` / `editor` / `viewer`, project membership, login rate limiting with lockout, and an audit log of every management action. |
-| **Rate limits and budgets** | Per-project requests and tokens per minute, daily and monthly token budgets shared across replicas, OpenAI-style `429` and `x-ratelimit-*` headers. |
-| **Metrics and a dashboard** | Per-request logs (tokens, latency, status, streaming, RAG use), summaries, daily series, CSV export — behind an embedded UI at `/admin/` and a REST API. |
+| **One API, every provider** | `/v1/chat/completions` (JSON and SSE), `/v1/models`, `/v1/embeddings`, `/v1/rerank`, `/v1/moderations`, plus `/v1/messages` for Anthropic SDKs and Claude Code. Change `base_url` and `api_key` in any official SDK; tool calls and reasoning settings are translated between providers. |
+| **Retrieval that ships with the gateway** | PDF / DOCX / HTML / TXT / Markdown, section-aware chunking, hybrid search (pgvector with Postgres full-text or ParadeDB BM25), reranking, metadata filters and sources returned with the answer. |
+| **Agents and MCP** | An MCP server at `/mcp` that exposes a project's RAG store as a search tool, per-project tool allow and deny lists, and session tracking to follow and cap an agent's run. |
+| **Routing and resilience** | Named routes with prioritised, weighted targets, retries before the first byte and a circuit breaker per connection. |
+| **Security controls** | `admin` / `editor` / `viewer` roles, TOTP two-factor login, an audit log, CIDR and `Origin` allowlists per key, guardrails with `/v1/moderations`, and credentials encrypted at rest with the key optionally held in Vault Transit or AWS KMS. |
+| **Limits and cost** | Rate limits and token budgets per project and per end user, shared across replicas, signed webhook alerts at 80 % and 100 % of a budget, and an editable price table that estimates the cost of every request. |
+| **Feedback, privacy and observability** | `/v1/feedback` scores without content, KVKK anonymisation that keeps usage history, request logs, Prometheus `/metrics`, OpenTelemetry traces and an embedded dashboard at `/admin/`. |
 
 ## Try it
 
+Requires Docker. One container runs the gateway with its own PostgreSQL 17 and pgvector:
+
 ```bash
-git clone https://github.com/Ragmux/ragmux.git && cd ragmux
-cp .env.example .env
-echo "SECRET_KEY=$(openssl rand -hex 32)" >> .env
-echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)" >> .env
-echo "RAGMUX_DB_PASSWORD=$(openssl rand -hex 16)" >> .env
-docker compose up -d
+docker run -d --name ragmux \
+  -p 127.0.0.1:8765:8765 \
+  -e SECRET_KEY="$(openssl rand -hex 32)" \
+  -v ragmux-data:/data \
+  ragmux/ragmux:latest
 ```
 
-Open <http://localhost:8080/admin/> and create the first administrator. Prebuilt images are
-published as `ghcr.io/ragmux/ragmux`. The full walkthrough — connections, RAG stores, projects
-and the first call — is in the [repository README](https://github.com/Ragmux/ragmux#readme).
+Open <http://localhost:8765/admin/> and create the first administrator. Keep the
+`SECRET_KEY` with your backups, and pin a version instead of `latest` in production. Images
+are published to Docker Hub as `ragmux/ragmux` and mirrored to `ghcr.io/ragmux/ragmux`; the
+gateway-only (`-app`) and ParadeDB (`-paradedb`) variants, Docker Compose and the first call
+are in the [repository README](https://github.com/Ragmux/ragmux#readme).
 
 ## Getting involved
 
@@ -75,7 +82,7 @@ and please report security problems privately as described in
 
 - 🐛 [Report a bug](https://github.com/Ragmux/ragmux/issues/new?template=bug_report.yml)
 - 💡 [Request a feature](https://github.com/Ragmux/ragmux/issues/new?template=feature_request.yml)
-- 📖 [Read the docs](https://github.com/Ragmux/ragmux#documentation)
+- 📖 [Read the docs](https://github.com/Ragmux/ragmux#documentation) or the [wiki](https://github.com/Ragmux/ragmux/wiki)
 - 📬 <contact@ragmux.com>
 
 ## About

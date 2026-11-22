@@ -8,14 +8,18 @@ Most questions are answered in the docs that ship with the gateway:
 
 | Page | Contents |
 |---|---|
-| [README](https://github.com/Ragmux/ragmux#readme) | quick start, the first call, the project layout |
-| [Configuration](https://github.com/Ragmux/ragmux/blob/main/docs/configuration.md) | every environment variable and default, Compose variables, reverse-proxy and private-upstream notes |
-| [API reference](https://github.com/Ragmux/ragmux/blob/main/docs/api.md) | authentication, roles per endpoint, request and response examples, the error envelope |
-| [Retrieval (RAG)](https://github.com/Ragmux/ragmux/blob/main/docs/rag.md) | supported formats, chunking, hybrid search, reranking, context format |
-| [Users, roles and limits](https://github.com/Ragmux/ragmux/blob/main/docs/users-and-limits.md) | the roles matrix, login protection, audit log, rate limits and budgets |
-| [Providers](https://github.com/Ragmux/ragmux/blob/main/docs/providers.md) | provider types, translation details, request passthrough |
-| [Backup and restore](https://github.com/Ragmux/ragmux/blob/main/docs/backup-restore.md) | what to back up, the scripts, PITR, the restore runbook |
+| [README](https://github.com/Ragmux/ragmux#readme) | features, quick start, which image to choose, Docker Compose, upgrading |
+| [Configuration](https://github.com/Ragmux/ragmux/blob/main/docs/configuration.md) | every environment variable and default, flags, subcommands, Compose variables, secret key sources, reverse-proxy and private-upstream notes |
+| [API reference](https://github.com/Ragmux/ragmux/blob/main/docs/api.md) | authentication, roles per endpoint, the `/v1` surface including `/v1/messages`, `/v1/moderations` and `/v1/feedback`, the MCP endpoint, guardrails, the error envelope |
+| [Retrieval (RAG)](https://github.com/Ragmux/ragmux/blob/main/docs/rag.md) | formats, chunking, hybrid search, metadata filters, reranking, context placement and format |
+| [Users, roles and limits](https://github.com/Ragmux/ragmux/blob/main/docs/users-and-limits.md) | roles, login protection, two-factor login, anonymisation, network allowlists, audit log, rate limits, budgets, limit alerts, end users, tool governance |
+| [Providers](https://github.com/Ragmux/ragmux/blob/main/docs/providers.md) | provider types and presets, translation details, reasoning effort, routing, retry and fallback |
+| [Backup and restore](https://github.com/Ragmux/ragmux/blob/main/docs/backup-restore.md) | what to back up, the scripts, scheduled backups, the restore runbook |
+| [Scaling](https://github.com/Ragmux/ragmux/blob/main/docs/scaling.md) | several replicas, shared state, rolling restarts, rolling back |
+| [Dashboard](https://github.com/Ragmux/ragmux/blob/main/docs/dashboard.md) | every screen of the embedded dashboard |
+| [Observability](https://github.com/Ragmux/ragmux/blob/main/docs/observability.md) | `/metrics`, `/readyz` vs `/healthz`, tracing |
 | [Changelog](https://github.com/Ragmux/ragmux/blob/main/CHANGELOG.md) | what changed in each release |
+| [Wiki](https://github.com/Ragmux/ragmux/wiki) | the developer guide: local loop, tests, schema contract |
 
 The project website is <https://ragmux.com>.
 
@@ -35,7 +39,8 @@ difference between a fix this week and a week of back-and-forth.
 ## Security problems
 
 Never in a public issue. Follow [SECURITY.md](SECURITY.md): GitHub private
-vulnerability reporting, or <security@ragmux.com>.
+vulnerability reporting, or an email to `info@muhammetsafak.com` with the subject
+`[SECURITY] <repository name>`.
 
 ## Anything else
 

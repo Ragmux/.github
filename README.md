@@ -10,9 +10,11 @@ This repository holds two kinds of files:
   for any repository in the organization that does not ship its own copy, so a policy
   written once here applies everywhere.
 
-Nothing here is code, and nothing here is deployed. Editing a file in this repository
-changes what contributors see on the organization page and in the issue and pull request
-forms of [Ragmux/ragmux](https://github.com/Ragmux/ragmux).
+Nothing here is code, and nothing here is deployed. Editing `profile/README.md` changes the
+organization page. [Ragmux/ragmux](https://github.com/Ragmux/ragmux) ships its own code of
+conduct, contributing guide, security policy, issue forms and pull request template, so of the
+community health files only `SUPPORT.md` reaches it from here; the rest apply to repositories
+that do not carry their own copy.
 
 ## Layout
 
